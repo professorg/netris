@@ -6,7 +6,7 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 512
 #define NUM_OFFSETS 16
-#define STACK_SIZE 1024
+#define STACK_SIZE 256
 
 #define RESOURCE_PATH "resources/"
 
