@@ -3,8 +3,8 @@
 #define SDL_MAIN_HANDLED
 #include "SDL2/SDL.h"
 
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 512
+#define WINDOW_WIDTH 256
+#define WINDOW_HEIGHT 256
 #define NUM_OFFSETS 16
 #define STACK_SIZE 256
 
