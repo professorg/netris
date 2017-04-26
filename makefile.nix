@@ -1,4 +1,4 @@
-CFLAGS=-I/usr/local/include -D_REENTRANT
+CFLAGS=-I/usr/local/include -D_REENTRANT -Wall
 LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL2 -lpthread
 CC=gcc
 TARGETS=netris.c
