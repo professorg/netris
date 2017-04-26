@@ -2,7 +2,7 @@ CFLAGS=-I/usr/local/include -D_REENTRANT
 LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL2 -lpthread
 CC=gcc
 TARGETS=netris.c
-OUTPUT=netris
+OUTPUT=out/netris
 
 default: clean all
 
