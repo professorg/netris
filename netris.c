@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
     // Init memory
     flags = 0b00000000;
-    flags |= FLAG_IN_MENU & FLAG_TRUE;
+    flags |= FLAG_IN_MENU;
     offsets = (Uint8*) SDL_malloc(sizeof(Uint8) * NUM_OFFSETS);
     stack = (Uint8*) SDL_malloc(sizeof(Uint8) * STACK_SIZE);
     SDL_memset(offsets, 0, sizeof(Uint8) * NUM_OFFSETS);
