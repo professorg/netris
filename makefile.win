@@ -1,4 +1,4 @@
-CFLAGS=-I/opt/SDL-2.0.5/SDL2-2.0.5/i686-w64-mingw32/include -Dmain=SDL_main -Wall
+CFLAGS=-I/opt/SDL-2.0.5/SDL2-2.0.5/i686-w64-mingw32/include -Dmain=SDL_main -g -Wall
 LIBS=-L/opt/SDL-2.0.5/SDL2-2.0.5/i686-w64-mingw32/lib -lmingw32 -lSDL2main -lSDL2 -mwindows
 CC=i686-w64-mingw32-gcc
 TARGETS=netris.c

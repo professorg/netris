@@ -8,12 +8,24 @@
 #define NUM_OFFSETS 16
 #define STACK_SIZE 256
 
+#define STACK_POINTER_OFFSET 0x00
+#define MENU_NUMBER_OFFSET 0x01
+#define MENU_DATA_OFFSET 0x02
+
 #define RESOURCE_PATH "resources/"
+#define MENU_DATA "menus.bin"
+#define FONT_DATA "font.bmp"
+#define MAIN_MENU 0x00
 
 // Functions
 SDL_bool update();
 void draw();
+void menu_draw();
 SDL_bool menu_update(SDL_Keycode);
+void stack_push(Uint8);
+Uint8 stack_pop();
+void read_menu(Uint8);
+void draw_text(Uint8, Uint8, char);
 
 // Static variables
 
@@ -27,6 +39,8 @@ Uint8 flags;
 
 Uint8* offsets;
 Uint8* stack;
+
+SDL_Surface* font;
 
 int main(int argc, char* argv[])
 {
@@ -63,6 +77,14 @@ int main(int argc, char* argv[])
     SDL_memset(offsets, 0, sizeof(Uint8) * NUM_OFFSETS);
     SDL_memset(stack, 0, sizeof(Uint8) * STACK_SIZE);
 
+    offsets[MENU_NUMBER_OFFSET] = offsets[STACK_POINTER_OFFSET]++;
+    stack[offsets[MENU_NUMBER_OFFSET]] = MAIN_MENU;
+    offsets[MENU_DATA_OFFSET] = offsets[STACK_POINTER_OFFSET];
+
+    font = SDL_LoadBMP(RESOURCE_PATH FONT_DATA);
+
+    read_menu(stack[offsets[MENU_NUMBER_OFFSET]]);
+
     // The game loop
     SDL_bool done = SDL_FALSE;
     while (!done)
@@ -70,6 +92,11 @@ int main(int argc, char* argv[])
         done = update();
         draw();
     }
+
+    SDL_free(offsets);
+    SDL_free(stack);
+
+    SDL_FreeSurface(font);
 
     SDL_FreeSurface(surface);
     SDL_DestroyWindow(window);
@@ -81,8 +108,8 @@ int main(int argc, char* argv[])
 
 // Offsets:
 //  0   Stack pointer
-//  1
-//  2
+//  1   Menu number
+//  2   Menu data
 //  3
 //  4
 //  5
@@ -133,10 +160,12 @@ SDL_bool update()
 void draw()
 {
 
+    SDL_Rect bg_rect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+    SDL_FillRect(surface, &bg_rect, 0xFFFFFF);
     // Main draw code
     if (flags & FLAG_IN_MENU)
     {
-
+        menu_draw();
     }
 
     //Update
@@ -175,5 +204,76 @@ SDL_bool menu_update(SDL_Keycode key)
         // Menu right
     }
     return done;
+}
+
+void menu_draw()
+{
+    size_t i = -1;
+    size_t j = 0;
+    Uint8 x;
+    Uint8 y;
+    while (stack[offsets[MENU_DATA_OFFSET] + (++i)] != (Uint8)'\x0a')
+    {
+        if (j == 0)
+        {
+            x = stack[offsets[MENU_DATA_OFFSET] + i++];
+            y = stack[offsets[MENU_DATA_OFFSET] + i];
+            j++;
+        }
+        else
+        {
+            if (stack[offsets[MENU_DATA_OFFSET] + i] == (Uint8)';')
+            {
+                j = 0;
+            }
+            else
+            {
+                draw_text(x, y, stack[offsets[MENU_DATA_OFFSET] + i]);
+                x++;
+            }
+        }
+    }
+
+}
+
+void stack_push(Uint8 data)
+{
+    stack[offsets[STACK_POINTER_OFFSET]++] = data;
+}
+
+Uint8 stack_pop()
+{
+    return stack[offsets[STACK_POINTER_OFFSET]--];
+}
+
+void read_menu(Uint8 menu_index)
+{
+    FILE* file = fopen(RESOURCE_PATH MENU_DATA, "r");
+    char* str = (char*)SDL_malloc(256*sizeof(char)); 
+    while (--menu_index)
+    {
+        fscanf(file, "%s", str);
+    }
+    fscanf(file, "%s", str);
+    SDL_memcpy(stack + offsets[MENU_DATA_OFFSET], (Uint8*)str, sizeof(str));
+    offsets[STACK_POINTER_OFFSET] += sizeof(str) / sizeof(char);
+    stack[offsets[STACK_POINTER_OFFSET]++] = (Uint8)'\n';
+    SDL_free(str);
+    fclose(file);
+}
+
+void draw_text(Uint8 x, Uint8 y, char text)
+{
+    SDL_Rect src_rect;
+    src_rect.x = 8*(text % 8);
+    src_rect.y = 8*(text / 8);
+    src_rect.w = 8;
+    src_rect.h = 8;
+    SDL_Rect dst_rect;
+    dst_rect.x = x;
+    dst_rect.y = y;
+    dst_rect.w = 8;
+    dst_rect.h = 8;
+    SDL_BlitSurface(font, &src_rect, surface, &dst_rect);
 }
 
