@@ -212,7 +212,7 @@ void menu_draw()
     size_t j = 0;
     Uint8 x;
     Uint8 y;
-    while (stack[offsets[MENU_DATA_OFFSET] + (++i)] != (Uint8)'\x0a')
+    while (stack[offsets[MENU_DATA_OFFSET] + (++i)] != (Uint8)'\n')
     {
         if (j == 0)
         {
@@ -249,14 +249,21 @@ Uint8 stack_pop()
 void read_menu(Uint8 menu_index)
 {
     FILE* file = fopen(RESOURCE_PATH MENU_DATA, "r");
-    char* str = (char*)SDL_malloc(256*sizeof(char)); 
-    while (--menu_index)
+    char* str = (char*)SDL_malloc(256*sizeof(char));
+    size_t i;
+    for (i = 0; i < menu_index; i++)
     {
-        fscanf(file, "%*s");
+        while (fgets(str, 256, file))
+        {}
     }
-    fscanf(file, "%s", str);
-    SDL_memcpy(stack + offsets[MENU_DATA_OFFSET], (Uint8*)str, sizeof(str));
-    offsets[STACK_POINTER_OFFSET] += sizeof(str) / sizeof(char);
+    SDL_memset(str, 0, 256 * sizeof(char));
+    i = 0;
+    while (fgets(str, 256, file))
+    {
+        i++;
+    }
+    SDL_memcpy(stack + offsets[MENU_DATA_OFFSET], (Uint8*)str, i * sizeof(char));
+    offsets[STACK_POINTER_OFFSET] += i;
     stack[offsets[STACK_POINTER_OFFSET]++] = (Uint8)'\n';
     SDL_free(str);
     fclose(file);
