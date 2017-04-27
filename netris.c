@@ -252,7 +252,7 @@ void read_menu(Uint8 menu_index)
     char* str = (char*)SDL_malloc(256*sizeof(char)); 
     while (--menu_index)
     {
-        fscanf(file, "%s", str);
+        fscanf(file, "%*s");
     }
     fscanf(file, "%s", str);
     SDL_memcpy(stack + offsets[MENU_DATA_OFFSET], (Uint8*)str, sizeof(str));
