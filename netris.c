@@ -272,8 +272,6 @@ void draw_text(Uint8 x, Uint8 y, char text)
     SDL_Rect dst_rect;
     dst_rect.x = x;
     dst_rect.y = y;
-    dst_rect.w = 8;
-    dst_rect.h = 8;
     SDL_BlitSurface(font, &src_rect, surface, &dst_rect);
 }
 
