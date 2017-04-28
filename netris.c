@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
          SDL_WINDOWPOS_UNDEFINED,
          WINDOW_WIDTH,
          WINDOW_HEIGHT,
-         0
+         SDL_WINDOW_BORDERLESS
         );
     surface = SDL_GetWindowSurface(window);
 
@@ -229,7 +229,7 @@ void menu_draw()
             else
             {
                 draw_text(x, y, stack[offsets[MENU_DATA_OFFSET] + i]);
-                x++;
+                x += 8;
             }
         }
     }
@@ -250,21 +250,20 @@ void read_menu(Uint8 menu_index)
 {
     FILE* file = fopen(RESOURCE_PATH MENU_DATA, "r");
     char* str = (char*)SDL_malloc(256*sizeof(char));
-    size_t i;
-    for (i = 0; i < menu_index; i++)
+    char c;
+    size_t i = 0;
+    while (i < menu_index && (c = fgetc(file)) != EOF)
     {
-        while (fgets(str, 256, file))
-        {}
+        if (c == '\n') i++;
     }
-    SDL_memset(str, 0, 256 * sizeof(char));
     i = 0;
-    while (fgets(str, 256, file))
+    while ((c = fgetc(file)) != EOF && c != '\n')
     {
-        i++;
+        str[i++] = c;
     }
+    str[i++] = '\n';
     SDL_memcpy(stack + offsets[MENU_DATA_OFFSET], (Uint8*)str, i * sizeof(char));
     offsets[STACK_POINTER_OFFSET] += i;
-    stack[offsets[STACK_POINTER_OFFSET]++] = (Uint8)'\n';
     SDL_free(str);
     fclose(file);
 }
@@ -272,8 +271,8 @@ void read_menu(Uint8 menu_index)
 void draw_text(Uint8 x, Uint8 y, char text)
 {
     SDL_Rect src_rect;
-    src_rect.x = 8*(text % 8);
-    src_rect.y = 8*(text / 8);
+    src_rect.x = 8*(text % 16);
+    src_rect.y = 8*(text / 16);
     src_rect.w = 8;
     src_rect.h = 8;
     SDL_Rect dst_rect;

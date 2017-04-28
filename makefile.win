@@ -17,3 +17,5 @@ clean:
 all: $(TARGETS) 
 	$(CC) $(CFLAGS) $(TARGETS) -o $(OUTPUT) $(LIBS)
 	cp $(OUTPUT) ~/shared/Shared/
+	cp $(TARGETS) ~/shared/Shared/
+	cp -r resources/ ~/shared/Shared/
